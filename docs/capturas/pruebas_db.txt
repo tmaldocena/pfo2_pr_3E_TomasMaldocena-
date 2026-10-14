@@ -1,0 +1,4 @@
+=== Contenido de la tabla usuarios ===
+(1, 'tomi', 'scrypt:32768:8:1$HgzH7OESDypMwXHU$ee48b390fe991e7dfbefe517b9...')
+(2, 'ana', 'scrypt:32768:8:1$LsaWWrNo3F6fT0hY$47abd7dbe22f16d060ba393130...')
+(3, '<script>alert(1)</script>', 'scrypt:32768:8:1$FuuDPnAq7QT8VC0O$7caf20ea0da4aaed1b0408a836...')

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PFO 2 · Sistema de Gestión de Tareas</title>
+    <meta name="description" content="API REST con Flask, SQLite y contraseñas hasheadas. Documentación, pruebas y respuestas conceptuales.">
+    <style>
+        :root {
+            --bg: #f6f7fb;
+            --surface: #ffffff;
+            --text: #1f2a44;
+            --muted: #5b6478;
+            --accent: #3b5bdb;
+            --border: #e3e6ef;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+            --ok: #2b8a3e;
+            --warn: #e8590c;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #12141c;
+                --surface: #1b1e2a;
+                --text: #e6e8f0;
+                --muted: #9aa3b8;
+                --accent: #7c93ff;
+                --border: #2a2e3d;
+            }
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.65;
+        }
+        header {
+            padding: 3rem 1.25rem 2rem;
+            text-align: center;
+        }
+        header h1 { margin: 0 0 .5rem; font-size: clamp(1.7rem, 4vw, 2.5rem); }
+        header p { margin: 0 auto; max-width: 640px; color: var(--muted); }
+        .tags { margin-top: 1.25rem; display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; }
+        .tag {
+            font-size: .8rem; padding: .25rem .7rem; border-radius: 999px;
+            background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+        }
+        main { max-width: 860px; margin: 0 auto; padding: 0 1.25rem 4rem; }
+        section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.75rem 1.75rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 { margin: 0 0 1rem; font-size: 1.4rem; }
+        h3 { margin: 1.5rem 0 .5rem; font-size: 1.05rem; }
+        p, li { color: var(--text); }
+        ul { padding-left: 1.25rem; }
+        code {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: .88em;
+            background: var(--bg);
+            padding: .1rem .35rem;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+        }
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1rem 1.15rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: .85rem;
+            line-height: 1.55;
+        }
+        pre code { background: none; border: none; padding: 0; color: inherit; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+        th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+        th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+        .method { font-weight: 700; font-family: ui-monospace, Menlo, Consolas, monospace; }
+        .post { color: var(--warn); }
+        .get { color: var(--ok); }
+        figure { margin: 1.25rem 0; }
+        figure img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+        figcaption { font-size: .88rem; color: var(--muted); margin-top: .5rem; }
+        .note {
+            border-left: 4px solid var(--accent);
+            background: var(--bg);
+            padding: .85rem 1.1rem;
+            border-radius: 0 10px 10px 0;
+            font-size: .92rem;
+            color: var(--muted);
+        }
+        footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 1rem 3rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sistema de Gestión de Tareas</h1>
+        <p>API REST con Flask y SQLite: registro de usuarios, inicio de sesión y una ruta protegida. Contraseñas hasheadas, nunca en texto plano.</p>
+        <div class="tags">
+            <span class="tag">PFO 2</span>
+            <span class="tag">Python · Flask</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">scrypt</span>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <h2>Sobre este sitio</h2>
+            <p>Este sitio está publicado con GitHub Pages, que solo sirve contenido estático. Por eso acá se muestra la <strong>documentación, las capturas y las respuestas conceptuales</strong>; la API de Flask se ejecuta de forma local con los pasos de más abajo.</p>
+        </section>
+
+        <section id="ejecutar">
+            <h2>Cómo ejecutarlo</h2>
+<pre><code>pip install -r requirements.txt
+python3 servidor.py
+# El servidor queda en http://127.0.0.1:5000</code></pre>
+            <p>La base <code>tareas.db</code> se crea sola la primera vez. El código fuente está en <code>servidor.py</code> y las instrucciones completas de prueba, en el <code>README.md</code> del repositorio.</p>
+        </section>
+
+        <section id="endpoints">
+            <h2>Endpoints</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Método</th><th>Ruta</th><th>Descripción</th><th>Respuestas</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="method post">POST</td>
+                            <td><code>/registro</code></td>
+                            <td>Recibe <code>{"usuario": "...", "contraseña": "..."}</code> y guarda al usuario con la contraseña hasheada.</td>
+                            <td><code>201</code> <code>400</code> <code>409</code></td>
+                        </tr>
+                        <tr>
+                            <td class="method post">POST</td>
+                            <td><code>/login</code></td>
+                            <td>Verifica las credenciales e inicia la sesión.</td>
+                            <td><code>200</code> <code>400</code> <code>401</code></td>
+                        </tr>
+                        <tr>
+                            <td class="method get">GET</td>
+                            <td><code>/tareas</code></td>
+                            <td>Muestra un HTML de bienvenida. Requiere haber iniciado sesión.</td>
+                            <td><code>200</code> <code>401</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="capturas">
+            <h2>Capturas de pruebas exitosas</h2>
+
+            <figure>
+                <img src="capturas/02_tareas_con_sesion_bienvenida.png" alt="Página de bienvenida de /tareas con sesión iniciada" loading="lazy">
+                <figcaption><code>GET /tareas</code> con sesión iniciada: devuelve el HTML de bienvenida.</figcaption>
+            </figure>
+
+            <figure>
+                <img src="capturas/01_tareas_sin_sesion_401.png" alt="Respuesta 401 de /tareas sin sesión" loading="lazy">
+                <figcaption><code>GET /tareas</code> sin sesión: acceso denegado (401).</figcaption>
+            </figure>
+
+            <figure>
+                <img src="capturas/03_pruebas_curl.png" alt="Salida de las pruebas de todos los endpoints" loading="lazy">
+                <figcaption>Pruebas de todos los endpoints, incluyendo los casos de error (usuario duplicado, datos incompletos, contraseña incorrecta).</figcaption>
+            </figure>
+
+            <figure>
+                <img src="capturas/04_base_de_datos_hashes.png" alt="Tabla usuarios con hashes" loading="lazy">
+                <figcaption>La tabla <code>usuarios</code> guarda solo hashes. <code>tomi</code> y <code>ana</code> tienen la misma contraseña pero hashes distintos, gracias a la sal aleatoria.</figcaption>
+            </figure>
+        </section>
+
+        <section id="conceptuales">
+            <h2>Respuestas conceptuales</h2>
+
+            <h3>¿Por qué hashear contraseñas?</h3>
+            <p>Si las contraseñas se guardaran en texto plano, cualquiera que accediera a la base de datos (por una filtración, un backup mal protegido o un administrador curioso) vería todas las contraseñas tal cual. Como mucha gente reutiliza la misma contraseña en varios servicios, el daño se extendería a sus otras cuentas.</p>
+            <p>Un <strong>hash</strong> es una función de un solo sentido: de la contraseña se obtiene una huella, pero de la huella no se puede recuperar la contraseña. Al iniciar sesión se calcula el hash de lo que escribió el usuario y se compara con el guardado.</p>
+            <ul>
+                <li><strong>Sal aleatoria:</strong> un valor único por usuario que se mezcla antes de hashear. Dos usuarios con la misma contraseña tienen hashes distintos y se anulan las tablas precalculadas.</li>
+                <li><strong>Algoritmo lento a propósito</strong> (scrypt, bcrypt, PBKDF2): hace muy costoso probar millones de combinaciones, a diferencia de hashes rápidos como MD5 o SHA-1.</li>
+            </ul>
+            <p>Hashear no es cifrar: el cifrado se revierte con la clave; el hash no está pensado para revertirse.</p>
+
+            <h3>Ventajas de usar SQLite en este proyecto</h3>
+            <ul>
+                <li><strong>Sin servidor:</strong> es una librería que lee y escribe un único archivo; no hay nada que instalar ni configurar aparte.</li>
+                <li><strong>Incluido en Python:</strong> <code>sqlite3</code> es parte de la librería estándar, así que no suma dependencias.</li>
+                <li><strong>Portable:</strong> toda la base es un archivo que se copia, respalda o borra para empezar de cero.</li>
+                <li><strong>Transacciones ACID y restricciones</strong> como <code>UNIQUE</code>, que evitan usuarios duplicados.</li>
+                <li><strong>SQL estándar:</strong> lo aprendido se traslada a PostgreSQL o MySQL.</li>
+            </ul>
+            <div class="note">Contrapartida: SQLite no está pensado para muchas escrituras simultáneas. Para un trabajo práctico y un prototipo con pocos usuarios es ideal; un sistema con mucho tráfico migraría a un motor cliente-servidor.</div>
+        </section>
+    </main>
+
+    <footer>PFO 2 · Sistema de Gestión de Tareas con API y Base de Datos</footer>
+</body>
+</html>

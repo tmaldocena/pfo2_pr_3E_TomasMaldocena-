@@ -1,0 +1,41 @@
+=== 1. Registro exitoso ===
+{"mensaje":"Usuario 'tomi' registrado correctamente"}
+
+HTTP 201
+
+=== 2. Registro duplicado (debe fallar) ===
+{"error":"El usuario ya existe"}
+
+HTTP 409
+
+=== 3. Registro con datos incompletos (debe fallar) ===
+{"error":"Se espera JSON: {\"usuario\": \"...\", \"contraseña\": \"...\"}"}
+
+HTTP 400
+
+=== 4. Login con contraseña incorrecta (debe fallar) ===
+{"error":"Usuario o contraseña incorrectos"}
+
+HTTP 401
+
+=== 5. GET /tareas sin iniciar sesión (debe fallar) ===
+{"error":"No autorizado. Iniciá sesión en POST /login"}
+
+HTTP 401
+
+=== 6. Login exitoso ===
+{"mensaje":"Bienvenido, tomi. Ya podés acceder a /tareas"}
+
+HTTP 200
+
+=== 7. GET /tareas con sesión iniciada (HTML de bienvenida) ===
+        <h1>¡Bienvenido, tomi!</h1>
+HTTP 200
+
+=== 8. Segundo usuario con la MISMA contraseña ===
+{"mensaje":"Usuario 'ana' registrado correctamente"}
+
+HTTP 201
+
+=== 9. Usuario con HTML en el nombre (no debe ejecutarse) ===
+        <h1>¡Bienvenido, &lt;script&gt;alert(1)&lt;/script&gt;!</h1>
